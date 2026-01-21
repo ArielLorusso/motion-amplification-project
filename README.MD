@@ -2,12 +2,10 @@ Tue 20 Jan 2026 11:52:44  :
 
 # Starting The first report
 
-1) First step i'm taking is making a summary of “The 6-Week Builder's Gauntlet” guide provided \
+1) First I'm  making a summary of “The 6-Week Builder's Gauntlet” guide provided \
 so I don't forget the core concepts and fundamentals in my project report
-
-2) Second thing is making a Project report document on how i plan my project \
-
-3) Then i will start uploading my code and updating the Project report as it gets developed 
+2) Then making a "project_report.md" document on how I plan my project
+3) After uploading my code I update the project report as it gets developed 
 
 <hr>
 
@@ -44,22 +42,17 @@ understand the landscape before you build on it.
 2) Adaptable **Problem-Solving** Engine \  
 ● Build from Scratch: The project must be new, preferably in a field you're unfamiliar \
 ● Embrace Tech Integration: Intentionally incorporate a technology you’ve never used before. \
-● Think About Your Thinking: When you get stuck. 
-
-        What is your process ?
-        Do you ask Google randomly? Do you read docs ?
-        Analyze your own problem-solving steps and identify what works
-● Ask Smart Questions: When you must ask for help, do it effectively.
+● Think About Your Thinking: When you get stuck. \
+        What is your process ?  Do you ask Google randomly ? Do you read docs ?\
+        Analyze your own problem-solving steps and identify what works \
+● Ask Smart Questions: When you must ask for help, do it effectively. \
 Clearly state the problem, what you’ve already tried
 
-3) Motivation
-	
-Define Your Drive:  Be honest with yourself. What is your motivation? 
-
-    ● Is it to   create value and solve a real problem? 
-    ● Is it to   be the go-to person who can solve any technical challenge? 
-    ● Is it to   build a better life for yourself or your family?
+3) Motivation \
+	Define Your Drive:  Be honest with yourself. What is your motivation? \
+    ● Is it to   create value and solve a real problem? \
+    ● Is it to   be the go-to person who can solve any technical challenge? \
+    ● Is it to   build a better life for yourself or your family? \
     Find your reason. Write it down. 
-
 
 When you are debugging at 2 AM and nothing works, this is what you will come back to.
