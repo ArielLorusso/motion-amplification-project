@@ -82,15 +82,20 @@
     
 
 # My Motivation : 
+
     1) To feel fulfilled by using my knowledge to provide solutions for me and others
+   
     2) To be versatile, knowing which methods and algorithms fits better to each problem.
+   
     3) To have fun by trying different ideas and comparing their pros and cons.
 		
 
 # Week by week schedule (subject to changes)
-    1st week :  Samples + Difference
-    2nd week :  FFT  temporal space mix 
-    3rd week :  Tracking & interpolation
+    1st week :  Video generation for test
+    2st week :  Samples + Difference
+    3nd week :  FFT  temporal space mix 
+    4rd week :  Tracking & interpolation
+    5rd week :  Research & review
 
 
 ◣ Tue 20 Jan 2026 19:44:59  Time by the end of this document
