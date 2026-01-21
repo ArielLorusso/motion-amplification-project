@@ -1,7 +1,10 @@
 
 video_samples.py Tue 20 Jan 2026 23:01:38  Start
-video_samples.py Tue 21 Jan 2026 12:01:46  1st commit
+video_samples.py Wed 21 Jan 2026 12:01:46  1st commit
 basic harcoded test of video generation
-video_samples.py Tue 21 Jan 2026 08:23:48  Start
-video_samples.py  21 Jan 2026 11:59:13     Second commit 
+video_samples.py Wed 21 Jan 2026 08:23:48  Start first refator
+video_samples.py Wed 21 Jan 2026 11:59:13  2nd commit 
 subpixel + linear motion refactored 
+now linear motion can be called my time section and added
+video_samples.py Wed 21 Jan 2026 12:11:35  Start implementing sinusoidal motion
+video_samples.py Wed 21 Jan 2026 16:06:01  3rd commit 
