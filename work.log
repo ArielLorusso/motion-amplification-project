@@ -13,4 +13,11 @@ video_samples.py Fri 23 Jan 2026 12:16:00  Start implementing rotation
 video_samples.py Fri 23 Jan 2026 14:05:04  First commit reimplementation of old code
 video_amplification.py Mon 26 Jan 2026 22:12:39  Start
 I start by making a video buffer and calculating the difference as a first step
-video_amplification.py Mon 26 Jan 2026 23:55:18  1st ommit 
+video_amplification.py Mon 26 Jan 2026 23:55:18  1st commit 
+video_amplification.py Tue 27 Jan 2026 08:33:13
+Worked on documenting a but the deque datastructute
+also added some cprofiler to measure function calls count and duration  
+video_samples.py 
+Realized that blue is a bad color to use because codec tends to smooth out low contrast.
+Red and green are better.   Cian, magenta and yellow are much better.
+video_amplification.py Thu 29 Jan 2026 10:58:50  2nd commit

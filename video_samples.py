@@ -6,7 +6,6 @@
 
 import cv2 as cv     # Import OpenCv library
 import numpy as np   # generate image and positions    
-import skimage.draw  # draw with float subpixel (openCV only uses int values)    
 import math
 
 #  pip list | grep cv     <-- see my version  of OpenCV
@@ -18,7 +17,7 @@ numpy                    1.26.4
 
 # time Parameters
 fps = 60
-seconds = 10
+seconds = 4
 frames = seconds * fps
 
 # Resolution  Parameters
@@ -29,8 +28,9 @@ h_center    = video_H // 2
 # Shape parameters
 rectangle_width, rectangle_height = 6, 6
 radius = 30
-color1 = (  0, 255, 255) # YELLOW
-color2 = (255,   0,   0) # RED
+color1 = (  0, 255, 255) # YELLOW  (BGR)
+color2 = (255, 255,   0) # CYAN
+#color2 = (  0,   0, 255) # RED  (BGR)
 
 #* create video object named out
 fourcc = cv.VideoWriter_fourcc(*"mp4v")  #  other options : DIVX, XVID, MJPG, X264, WMV1, WMV2
@@ -80,17 +80,24 @@ def rectangle(img, pos, sca, rot, color):
         # Rotate all points
         pts = pts @ rotation_matrix.T
     
+    
+    # 1. Increase sub-pixel resolution for smoother position but sharp pixels
+    # A shift of 4 or 8 bits is standard for high-precision sub-pixel drawing.
+    shift = 4
+    scale = 1 << shift  # 2^4 = 16
     # Translate to final position (OpenCV uses x, y which is col, row)
     pts[:, 0] += col  # x-coordinate (column)
     pts[:, 1] += row  # y-coordinate (row)
-    
-    # Subpixel rendering
-    shift = 4
-    scale = 1 << shift  # 2^4 = 16
-    pts_scaled = (pts * scale).astype(np.int32)
-    
+
+    # 2. Ensure your points are scaled correctly
+    pts_scaled = np.round(pts * scale).astype(np.int32)
+
+    # 3. Use cv.LINE_8 to avoid the "soft" look of anti-aliasing (LINE_AA)
     cv.fillConvexPoly(img, pts_scaled, color, lineType=cv.LINE_AA, shift=shift)
-    # ALTERNATIVE 
+
+    # ALTERNATIVES 
+#   cv.drawContours(img, [pts_scaled], contourIdx=-1, color=color thickness=-1, lineType=cv.LINE_8)    
+#   cv.rectangle(img,pt1=pt1, pt2=pt2, color=(255,0,0))
     # img = cv.warpAffine(img, rotation_matrix, (width, height))
     # https://opencv.org/blog/image-rotation-and-translation-using-opencv/#:~:text=1-,cv2.getRotationMatrix2D
 
@@ -257,8 +264,8 @@ def sine_position_animation ():
     return rectang_pos
 '''
 
-angle = sinusoidal_rotation(None, amp=45, freq=2, phase=45, 
-                           f_start=120, f_end=240, frames=frames)  # from 0 to 90    (45-45)  to (45+45)
+angle = sinusoidal_rotation(None, amp=15, freq=1, phase=45, 
+                           f_start=0, f_end=240, frames=frames)  # from 0 to 90    (45-45)  to (45+45)
 
 # rectang_pos = sine_position_animation ()     # same position and scale share dimention [x,y][i]
 # rectang_sca = sine_position_animation () /10 # so thers no need for making new functions, 
@@ -271,7 +278,7 @@ for i in range(frames):     # i = frame number : from 0 to frames -1
 
 #    centered_rectangle(img, rectang_pos[i] , width=6, height=6, color=color2)
     rectangle(img, rectang_pos[i] , (180,90) ,angle[i],   color=color2)  
-    ellipse  (img, circle_pos[i]  , (90,180),angle[i],   color=color1)
+    ellipse  (img, circle_pos[i]  , (90,180) ,angle[i],   color=color1)
     out.write(img)
 
 out.release()
