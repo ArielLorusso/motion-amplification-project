@@ -21,3 +21,8 @@ video_samples.py
 Realized that blue is a bad color to use because codec tends to smooth out low contrast.
 Red and green are better.   Cian, magenta and yellow are much better.
 video_amplification.py Thu 29 Jan 2026 10:58:50  2nd commit
+worked on testing diferent methods of appliying FFT 
+made a mode option to select between them
+processing was kind of slow so made a record option to be able to play the result at proper speed
+next I will work on why performance is so bad 
+video_amplification.py Thu 29 Jan 2026 10:58:50  2nd commit
