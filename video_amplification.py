@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 from collections import deque
 from scipy import fft  # better than numpy.fft
-
+import time
 
 # todo    Fix slow even when unprocessing  (mode 0)
 
@@ -22,7 +22,7 @@ cv.namedWindow(window_disp,   cv.WINDOW_NORMAL)
 def nothing(x):
     pass
 # Trackbars        Name                window,     MIN, MAX,  function  
-cv.createTrackbar("Mode",              controls_disp, 0, 4, nothing)  
+cv.createTrackbar("Mode",              controls_disp, 0, 5, nothing)  
 cv.createTrackbar("Frame delay",       controls_disp, 1, MAX_DELAY, nothing)
 cv.createTrackbar("Amplification",     controls_disp, 1, MAX_AMP, nothing)
 # 0: Diff, 1: Temporal FFT, 2: Spatiotemporal FFT, 3: Phase-based motion
@@ -38,20 +38,25 @@ class VideoFFTAnalyzer:
     def __init__(self, max_temporal_window=64):
         self.max_temporal_window = max_temporal_window
         self.temporal_buffer = None  # Will store (height, width, time) array
+        self.buffer_idx = 0  # Current write position (circular)
         self.frame_count = 0
         
     def add_frame(self, frame_gray):
         """Add frame to temporal buffer"""
         if self.temporal_buffer is None:
             h, w = frame_gray.shape
-            self.temporal_buffer = np.zeros((h, w, self.max_temporal_window), dtype=np.float32)
+            self.temporal_buffer = np.zeros(
+                (h, w, self.max_temporal_window), 
+                dtype=np.float32
+                )
         
         # Roll buffer and add new frame
-        self.temporal_buffer = np.roll(self.temporal_buffer, -1, axis=2)
-        self.temporal_buffer[:, :, -1] = frame_gray.astype(np.float32)
+        self.temporal_buffer[:, :, self.buffer_idx] = frame_gray.astype(np.float32)
+        # Update circular index
+        self.buffer_idx = (self.buffer_idx + 1) % self.max_temporal_window
         self.frame_count = min(self.frame_count + 1, self.max_temporal_window)
     
-    def per_pixel_temporal_fft(self, amplification=10, freq_min=0.5, freq_max=10, fps=30):
+    def per_pixel_temporal_fft(self, amplification=10, freq_min=0.5, freq_max=10, fps=30,subsample=4):
         """
         A) Per-pixel temporal FFT
         Computes 1D FFT along time axis for each pixel independently
@@ -68,7 +73,8 @@ class VideoFFTAnalyzer:
         
         # Get actual data (not zero-padded part)
         valid_data = self.temporal_buffer[:, :, -self.frame_count:]
-        
+
+        valid_data = valid_data[::subsample, ::subsample, :]        
         # 1D FFT along time axis (axis=2)
         fft_result = fft.fft(valid_data, axis=2)
         
@@ -136,7 +142,7 @@ class VideoFFTAnalyzer:
         
         return spatial_freq_map
     
-    def phase_based_motion_amplification(self, amplification=10, freq_min=0.5, freq_max=10):
+    def phase_based_motion_amplification(self, amplification=10, freq_min=0.5, freq_max=10,subsample=4):
         """
         Phase-based motion amplification (inspired by MIT's motion magnification)
         Uses phase information to amplify subtle motion
@@ -149,7 +155,8 @@ class VideoFFTAnalyzer:
             return np.zeros(self.temporal_buffer.shape[:2], dtype=np.uint8)
         
         valid_data = self.temporal_buffer[:, :, -self.frame_count:]
-        
+        valid_data = valid_data[::subsample, ::subsample, :]    
+
         # 1D FFT per pixel
         fft_result = fft.fft(valid_data, axis=2)
         
@@ -174,7 +181,7 @@ class VideoFFTAnalyzer:
         
         return current_frame
 
-    def phase_3d_amplification(self, subsample=4, amplification=10, freq_min=0.5, freq_max=10, fps=30):
+    def phase_3d_amplification(self, amplification=10, freq_min=0.5, freq_max=10, fps=30, subsample=4):
         """
         Simpler version without fftshift
         """
@@ -285,6 +292,7 @@ print("Mode 1: Frame Difference ")
 print("Mode 2: Per-Pixel Temporal FFT")
 print("Mode 3: 3D Spatiotemporal FFT")
 print("Mode 4: Phase-Based Motion Amplification")
+print("Mode 5: phase_3d_amplification")
 print("\nRecord Trackbar:")
 print("  0 = Off (not recording)")
 print("  1 = On (recording to file)")
@@ -294,6 +302,7 @@ print("================\n")
 #============================================================================================
 
 while True:
+    t_start = time.perf_counter()
     ret, frame = cap.read()
     if not ret:
         cap.set(cv.CAP_PROP_POS_FRAMES, 0)
@@ -358,7 +367,7 @@ while True:
     if   mode == 0:                   # dont process video
         display = frame     
 
-    if   mode == 1:
+    elif mode == 1:
         # Original frame difference
         if delay < len(frame_buffer):
             old_frame = frame_buffer[-(delay + 1)]
@@ -376,7 +385,8 @@ while True:
         motion_map = fft_analyzer.per_pixel_temporal_fft(
             freq_min=freq_min, 
             freq_max=freq_max, 
-            fps=fps
+            fps=fps,
+            subsample=4
         )
         display = cv.applyColorMap(motion_map, cv.COLORMAP_JET)
     
@@ -391,7 +401,8 @@ while True:
         amplified = fft_analyzer.phase_based_motion_amplification(
             amplification=amp,
             freq_min=freq_min,
-            freq_max=freq_max
+            freq_max=freq_max,
+            subsample=4
         )
         display = cv.cvtColor(amplified, cv.COLOR_GRAY2BGR)
 
@@ -399,21 +410,49 @@ while True:
         # Phase-based motion amplification
         freq_high = freq_max
         amplified = fft_analyzer.phase_3d_amplification(
-            subsample=4,
             amplification=amp,
             freq_min=freq_min,
-            freq_max=freq_max
+            freq_max=freq_max,
+            subsample=4
         )
         display = cv.cvtColor(amplified, cv.COLOR_GRAY2BGR)
     
     else:
         display = frame
     
+    # print("Mode 0: Show unprocess video")
+    # print("Mode 1: Frame Difference ")
+    # print("Mode 2: Per-Pixel Temporal FFT")
+    # print("Mode 3: 3D Spatiotemporal FFT")
+    # print("Mode 4: Phase-Based Motion Amplification")
+    # print("Mode 5: phase_3d_amplification")
+
+    # Add mode label
+    mode_names = ["original",
+                  "frame Diffe", 
+                  "per_pixel FFT", 
+                  "Spatiotemporal FFT", 
+                  "per pixel Phase Amplification",
+                  "3D Phase Amplification"
+                  ]
+    cv.putText(display, f"Mode: {mode_names[mode]}", (10, 30),
+               cv.FONT_HERSHEY_SIMPLEX, 0.35, (0, 255, 0), 1)
+    
+    # Add recording indicator
+    if is_recording:
+        cv.circle(display, (display.shape[1] - 30, 30), 10, (0, 0, 255), -1)
+        cv.putText(display, "REC", (display.shape[1] - 80, 40),
+                   cv.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
+
     #*█████████     Display VODEO       ████████████████████████████████████████
 
     cv.imshow(window_disp, display)
-    if cv.waitKey(13) == 27:  # ESC
+    if cv.waitKey(1) == 27:   # ESC
         break                 # exit video Loop
+
+    t_end = time.perf_counter()
+    print (f"time:{t_start-t_end}", end='\r', flush=True)
+
 
 # Cleanup
 if video_writer is not None:

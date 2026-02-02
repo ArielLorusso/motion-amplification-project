@@ -20,9 +20,15 @@ also added some cprofiler to measure function calls count and duration
 video_samples.py 
 Realized that blue is a bad color to use because codec tends to smooth out low contrast.
 Red and green are better.   Cian, magenta and yellow are much better.
-video_amplification.py Thu 29 Jan 2026 10:58:50  2nd commit
+video_amplification.py Thu 29 Jan 2026 10:58:50  commit
 worked on testing diferent methods of appliying FFT 
 made a mode option to select between them
 processing was kind of slow so made a record option to be able to play the result at proper speed
 next I will work on why performance is so bad 
-video_amplification.py Thu 29 Jan 2026 10:58:50  2nd commit
+video_amplification.py Thu 29 Jan 2026 10:58:50  commit
+video_amplification.py Sun  1 Feb 2026 17:59:47
+changed the bufferto a circular one for better parformance
+Timed thr video loop instead of profiling
+added label for the output video so it shows what is being done.
+video_amplification.py Sun  1 Feb 2026 17:59:47  commu
+ 
