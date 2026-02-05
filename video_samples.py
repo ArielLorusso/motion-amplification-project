@@ -214,17 +214,17 @@ def sinusoidal_rotation(rot, amp, freq, phase, f_start, f_end, frames):
         
         # Calculate sinusoidal position
         # 2π * frequency * t gives the angle for the desired number of cycles
-        phase = 2 * math.pi * freq * t      # variable phase is repurpused
-        angle_offset =  amp * math.sin(phase)
+        inner_phase  = 2 * math.pi * freq * t      # variable phase is repurpused
+        angle_offset =  amp * math.sin(inner_phase)
 
-        rot[i] = phase + angle_offset  # Set angle (center + oscillation)
+        rot[i] = phase  + angle_offset  # Set angle (center + oscillation)
     
     # Hold the last rotation for remaining frames
     if f_end < frames:
         last = rot[f_end - 1]
         for i in range(f_end, frames):
             rot[i] = last
-
+    # print (f"time:{rot}", end='\r', flush=True)
     
     return rot
 
@@ -264,7 +264,7 @@ def sine_position_animation ():
     return rectang_pos
 '''
 
-angle = sinusoidal_rotation(None, amp=15, freq=1, phase=45, 
+angle = sinusoidal_rotation(None, amp=45, freq=2, phase=45, 
                            f_start=0, f_end=240, frames=frames)  # from 0 to 90    (45-45)  to (45+45)
 
 # rectang_pos = sine_position_animation ()     # same position and scale share dimention [x,y][i]
@@ -285,7 +285,7 @@ out.release()
 
 # This script is good for some test but improvements can be done to it
 
-#todo   Add :     scale /ratation motion
+#todo   Add :     scale motion
 #todo   Add :     color hue rotation (time)
 #todo   Add :     color gradients    (space)
 
